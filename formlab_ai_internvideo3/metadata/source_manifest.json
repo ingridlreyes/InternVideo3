@@ -1,0 +1,23 @@
+{
+  "ALEX-GYM-1": {
+    "type": "OBSERVED_PUBLIC_DATASET",
+    "purpose": "Exercise-specific biomechanical labels for squat, lunge and single-leg Romanian deadlift.",
+    "source": "https://github.com/AhmedYasserrr/ALEX-GYM-1",
+    "paper": "https://www.scitepress.org/Papers/2025/136694/136694.pdf",
+    "records_reported": 670
+  },
+  "InternVideo3-8B-Instruct": {
+    "type": "OPEN_WEIGHT_MODEL",
+    "purpose": "Deep video understanding, temporal evidence accumulation and natural-language explanation.",
+    "repo": "https://github.com/OpenGVLab/InternVideo/tree/main/InternVideo3",
+    "repo_commit_checked": "3965eef16e2dadd0ea6c8d0cc29c8a3039df52e3",
+    "model": "yanziang/InternVideo3-8B-Instruct",
+    "license": "Apache-2.0"
+  },
+  "MediaPipe Pose Landmarker": {
+    "type": "PRETRAINED_POSE_MODEL",
+    "purpose": "Low-latency 33-landmark pose estimation in browser for uploaded video and webcam.",
+    "package": "@mediapipe/tasks-vision@0.10.18",
+    "model_asset": "pose_landmarker_full/float16/1"
+  }
+}

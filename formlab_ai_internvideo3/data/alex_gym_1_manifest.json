@@ -1,0 +1,80 @@
+{
+  "dataset": "ALEX-GYM-1",
+  "primary_role": "Fine-grained exercise-quality reference dataset",
+  "published": "ICINCO 2025",
+  "participants": 45,
+  "demographics": {
+    "female": 12,
+    "male": 33,
+    "age_groups": {
+      "8-12": 4,
+      "13-19": 7,
+      "20-35": 31,
+      "36-54": 3
+    }
+  },
+  "videos": {
+    "squat": 295,
+    "lunge": 106,
+    "single_leg_romanian_deadlift": 269,
+    "total": 670
+  },
+  "capture": {
+    "views": [
+      "frontal",
+      "lateral"
+    ],
+    "fps_original": 30,
+    "duration_seconds": "3-8",
+    "preprocessing_in_paper": "16 uniformly spaced frames per camera view",
+    "pose_landmarks": 33,
+    "pose_source": "MediaPipe 3D pose estimation"
+  },
+  "criteria": {
+    "squat": [
+      "feet flat",
+      "simultaneous hip/knee bend",
+      "backward hip movement",
+      "neutral lower back",
+      "hips below knees",
+      "feet angled 30 degrees"
+    ],
+    "lunge": [
+      "shoulder-width heels",
+      "forward gaze",
+      "90-degree knee bend",
+      "natural arm movement",
+      "aligned feet",
+      "straight back",
+      "back knee positioning"
+    ],
+    "single_leg_romanian_deadlift": [
+      "balance maintenance",
+      "back alignment",
+      "full leg extension",
+      "controlled reversal",
+      "support knee angle"
+    ]
+  },
+  "published_multimodal_results": {
+    "squat": {
+      "hamming_loss": 0.0259,
+      "f1": 0.9706
+    },
+    "single_leg_romanian_deadlift": {
+      "hamming_loss": 0.0488,
+      "f1": 0.9347
+    },
+    "lunge": {
+      "hamming_loss": 0.0756,
+      "f1": 0.9097
+    }
+  },
+  "access": {
+    "repo": "https://github.com/AhmedYasserrr/ALEX-GYM-1",
+    "repo_commit_checked": "86e8a6d538524e3c4f2f34d1507e8e01d6fd65c1",
+    "processed_data": "https://drive.google.com/drive/u/1/folders/124MjpOoon8haYdXwveQAK-hSOoyS-Ivv",
+    "paper": "https://www.scitepress.org/Papers/2025/136694/136694.pdf"
+  },
+  "bundle_status": "Metadata and adapter are bundled. Original videos/weights are not copied into this deliverable."
+}

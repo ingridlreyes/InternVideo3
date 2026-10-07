@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FormLab AI</title><style>
+:root{
+  --paper:#f3eee4;
+  --paper-2:#e9e2d4;
+  --card:#fbf8f2;
+  --ink:#282c22;
+  --muted:#787b6a;
+  --olive:#68704b;
+  --olive-dark:#474d35;
+  --olive-soft:#dce0cb;
+  --sage:#a8ad8d;
+  --line:#d7d0c2;
+  --terracotta:#a86d55;
+  --cream:#fffdf8;
+  --shadow:0 12px 28px rgba(61,58,43,.07);
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 8% 0%,rgba(104,112,75,.10),transparent 25%),
+    var(--paper);
+  color:var(--ink);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+button,input,select,textarea{font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:3px solid rgba(104,112,75,.22);outline-offset:2px
+}
+.shell{max-width:1400px;margin:auto;padding:0 22px 70px}
+.hero{padding:34px 2px 22px;display:flex;justify-content:space-between;gap:28px;align-items:flex-end}
+.kicker{text-transform:uppercase;letter-spacing:.16em;font-size:10px;font-weight:800;color:var(--olive)}
+.hero h1{font-family:Georgia,"Times New Roman",serif;font-size:42px;line-height:1;margin:7px 0 10px;font-weight:500;letter-spacing:-1px}
+.hero p{margin:0;max-width:760px;color:var(--muted);font-size:13px;line-height:1.65}
+.provenance{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.pill{border:1px solid var(--line);background:rgba(251,248,242,.72);padding:7px 10px;border-radius:999px;font-size:9px;font-weight:850;letter-spacing:.05em;white-space:nowrap}
+.pill.observed{color:#476149}.pill.derived{color:#65704d}.pill.model{color:#8d624d}
+.nav{
+  position:sticky;top:0;z-index:30;
+  display:flex;gap:3px;overflow:auto;
+  padding:8px 0;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  background:rgba(243,238,228,.94);backdrop-filter:blur(10px)
+}
+.nav button{border:0;background:transparent;color:var(--muted);padding:10px 13px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.nav button.active{background:var(--olive);color:#fff}
+.page{display:none;padding-top:20px}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}
+.card{background:rgba(251,248,242,.94);border:1px solid var(--line);border-radius:18px;padding:17px;box-shadow:var(--shadow);min-width:0}
+.flat{box-shadow:none}
+.span3{grid-column:span 3}.span4{grid-column:span 4}.span5{grid-column:span 5}.span6{grid-column:span 6}.span7{grid-column:span 7}.span8{grid-column:span 8}.span9{grid-column:span 9}.span12{grid-column:span 12}
+.title{font-family:Georgia,"Times New Roman",serif;font-size:19px;font-weight:500;margin:0 0 12px}
+.subtitle{font-size:11px;color:var(--muted);line-height:1.55}
+.control{margin-bottom:10px}.control label{display:block;margin-bottom:5px;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.11em;font-weight:850}
+select,input,textarea{
+  width:100%;border:1px solid var(--line);background:var(--cream);color:var(--ink);
+  border-radius:11px;padding:10px 11px;font-size:13px
+}
+textarea{min-height:96px;resize:vertical}
+.fileDrop{
+  display:block;border:1px dashed #a9aa94;border-radius:14px;background:#f6f2e9;padding:18px;text-align:center;
+  color:var(--olive-dark);cursor:pointer;transition:.15s ease
+}
+.fileDrop.drag{background:var(--olive-soft);border-color:var(--olive)}
+.fileDrop input{display:none}
+.fileDrop b{display:block;font-family:Georgia,serif;font-size:17px;font-weight:500}
+.fileDrop span{display:block;color:var(--muted);font-size:10.5px;margin-top:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--olive);background:var(--olive);color:#fff;border-radius:999px;padding:10px 14px;font-size:11px;font-weight:800;cursor:pointer}
+.btn.secondary{background:transparent;color:var(--olive-dark);border-color:#aaa995}
+.btn.ghost{background:transparent;color:var(--muted);border-color:var(--line)}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.notice{background:#eee9dc;border-left:3px solid var(--olive);border-radius:9px;padding:10px 12px;color:#626555;font-size:10.5px;line-height:1.55}
+.notice.warn{border-color:var(--terracotta);background:#f2e5dc}
+.videoStage{
+  min-height:460px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  background:#25281f;border:1px solid #4b4e40;border-radius:18px
+}
+.videoStage video{display:block;max-width:100%;max-height:650px}
+.videoStage canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.emptyVideo{position:absolute;color:#abb09a;text-align:center;font-size:12px;max-width:240px;line-height:1.55;pointer-events:none}
+.statusDot{width:8px;height:8px;border-radius:50%;background:#b8b3a7;display:inline-block}.statusDot.on{background:#68704b}.statusDot.err{background:#a86d55}
+.statusLine{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:10.5px;margin-top:10px}
+.metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.metric{padding:12px 10px;border-top:1px solid var(--line)}
+.metric b{display:block;font-family:Georgia,serif;font-size:23px;font-weight:500}.metric span{display:block;color:var(--muted);font-size:9px;margin-top:3px}
+.trace{width:100%;height:112px;border-radius:12px;background:#f5f1e7;border:1px solid var(--line)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:9px;color:var(--muted);margin-top:6px}
+.legend i{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
+.criteriaPills{display:flex;gap:7px;flex-wrap:wrap}.criterionBtn{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:8px 11px;font-size:10px;cursor:pointer}.criterionBtn.active{background:var(--olive-soft);border-color:var(--olive);color:var(--olive-dark)}
+.criterionDetail{margin-top:10px;padding:13px;border-radius:12px;background:#f2eee4;border:1px solid var(--line);min-height:80px}
+.criterionDetail b{font-size:12px}.criterionDetail p{font-size:10.5px;color:var(--muted);line-height:1.5;margin:5px 0 0}
+.tag{display:inline-block;border:1px solid #bbb9a8;border-radius:999px;padding:3px 6px;font-size:8px;font-weight:800;color:var(--olive-dark);margin-left:5px}
+.tag.model{color:#8d624d;border-color:#cfb4a5}.tag.view{color:#777564;border-color:#c7c1b2}
+.flagList{display:grid;gap:7px}.flag{padding:10px;border-bottom:1px solid var(--line)}.flag:last-child{border-bottom:0}.flag b{font-size:10.5px}.flag p{font-size:9.5px;color:var(--muted);line-height:1.5;margin:3px 0 0}
+.repTimeline{display:flex;gap:5px;align-items:stretch;overflow:auto;padding-bottom:3px}.repChip{min-width:72px;border:1px solid var(--line);background:#f5f0e5;border-radius:12px;padding:9px;cursor:pointer;text-align:left}.repChip:hover,.repChip.active{background:var(--olive-soft);border-color:var(--olive)}.repChip b{display:block;font-size:11px}.repChip span{font-size:9px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:10.5px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-size:8.5px}.clickrow{cursor:pointer}.clickrow:hover{background:#f0ebdf}.scroll{overflow:auto;max-height:400px}
+.deepBox{white-space:pre-wrap;padding:14px;border:1px solid var(--line);border-radius:14px;background:#f6f1e8;min-height:150px;font-size:11px;line-height:1.6;color:#505346}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.evidenceCard{padding:14px 0;border-bottom:1px solid var(--line)}.evidenceCard:last-child{border-bottom:0}.evidenceCard b{font-size:11px}.evidenceCard p{font-size:10px;color:var(--muted);line-height:1.55;margin:4px 0 0}
+.datasetStat{font-family:Georgia,serif;font-size:30px;color:var(--olive-dark)}
+.codeish{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9.5px;background:#ece7db;border-radius:8px;padding:3px 5px}
+.hidden{display:none!important}
+footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);color:#939282;font-size:9.5px}
+@media(max-width:1050px){
+  .span3,.span4,.span5,.span6,.span7,.span8,.span9{grid-column:span 12}
+  .hero{align-items:flex-start;flex-direction:column}.provenance{justify-content:flex-start}
+  .metrics{grid-template-columns:repeat(3,1fr)}.videoStage{min-height:360px}
+}
+@media(max-width:650px){
+  .shell{padding:0 10px 40px}.hero h1{font-size:34px}
+  .metrics{grid-template-columns:repeat(2,1fr)}.split{grid-template-columns:1fr}
+}
+</style></head>
+<body><div class="shell">
+  <header class="hero">
+    <div>
+      <div class="kicker">Movement intelligence</div>
+      <h1>FormLab AI</h1>
+      <p>Video, pose y razonamiento temporal para estudiar técnica de entrenamiento. La interfaz separa lo observado, lo calculado y lo interpretado por el modelo para que cada conclusión tenga trazabilidad.</p>
+    </div>
+    <div class="provenance">
+      <span class="pill observed">POSE · OBSERVADO</span>
+      <span class="pill derived">ÁNGULOS · DERIVADO</span>
+      <span class="pill model">INTERNVIDEO3 · MODELO</span>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <button class="active" data-page="analyze">Analizar</button>
+    <button data-page="session">Sesión</button>
+    <button data-page="deep">Video AI</button>
+    <button data-page="evidence">Evidencia</button>
+  </nav>
+
+  <section id="analyze" class="page active">
+    <div class="grid">
+      <aside class="card flat span4">
+        <h2 class="title">Tu video</h2>
+        <div class="control"><label>Ejercicio</label>
+          <select id="exercise">
+            <option value="squat">Sentadilla</option>
+            <option value="lunge">Zancada</option>
+            <option value="single_leg_rdl">Peso muerto rumano a una pierna</option>
+            <option value="conventional_deadlift">Peso muerto convencional</option>
+          </select>
+        </div>
+
+        <label id="fileDrop" class="fileDrop">
+          <input id="videoFile" type="file" accept="video/*">
+          <b>Sube o arrastra tu video</b>
+          <span>MP4, MOV, WebM u otro formato compatible con tu navegador</span>
+        </label>
+
+        <div class="actions" style="margin-top:10px">
+          <button id="startCamera" class="btn">Usar cámara</button>
+          <button id="stopCamera" class="btn secondary" disabled>Detener</button>
+        </div>
+
+        <div class="statusLine"><span id="poseDot" class="statusDot"></span><span id="poseText">Inicializando…</span></div>
+        <div id="errorBox" class="notice warn hidden" style="margin-top:10px"></div>
+
+        <div class="split" style="margin-top:15px">
+          <div><div class="kicker">Fuente</div><div id="fileLabel" class="subtitle">Sin video</div></div>
+          <div><div class="kicker">Duración</div><div id="duration" class="subtitle">—</div></div>
+        </div>
+
+        <div style="margin-top:14px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--muted)">
+            <input id="skeletonToggle" type="checkbox" checked style="width:auto"> Mostrar esqueleto
+          </label>
+        </div>
+
+        <div class="notice" style="margin-top:14px">
+          El peso muerto convencional está disponible como <b>modo pose/temporal experimental</b>. ALEX-GYM-1 etiqueta peso muerto rumano a una pierna, no el convencional.
+        </div>
+      </aside>
+
+      <div class="card span8">
+        <div class="videoStage">
+          <video id="video" playsinline></video><canvas id="overlay"></canvas>
+          <div id="emptyVideo" class="emptyVideo">Sube un video o activa la cámara para comenzar.</div>
+        </div>
+      </div>
+
+      <div class="card span12">
+        <div style="display:flex;justify-content:space-between;gap:14px;align-items:end;flex-wrap:wrap">
+          <div><div class="kicker">Movimiento en vivo</div><h2 class="title" style="margin-top:4px">Cinética de la repetición</h2></div>
+          <div class="subtitle">Fase: <b id="phase">esperando</b> · Reps: <b id="repCount">0</b></div>
+        </div>
+        <div class="metrics">
+          <div class="metric"><b id="m_knee">—</b><span>Rodilla</span></div>
+          <div class="metric"><b id="m_hip">—</b><span>Cadera</span></div>
+          <div class="metric"><b id="m_trunk">—</b><span>Inclinación tronco</span></div>
+          <div class="metric"><b id="m_sym">—</b><span>Diferencia L/R</span></div>
+          <div class="metric"><b id="m_visibility">—</b><span>Visibilidad pose</span></div>
+        </div>
+        <canvas id="trace" class="trace"></canvas>
+        <div class="legend"><span><i style="background:#68704b"></i>rodilla</span><span><i style="background:#9a7d58"></i>cadera</span><span><i style="background:#a86d55"></i>tronco</span></div>
+      </div>
+
+      <div class="card span7">
+        <div class="kicker">Criterios</div><h2 class="title" style="margin-top:4px">¿Qué puede revisar?</h2>
+        <div class="subtitle" style="margin-bottom:10px">Referencia: <b id="referenceText"></b></div>
+        <div id="criteriaPills" class="criteriaPills"></div>
+        <div id="criterionDetail" class="criterionDetail"></div>
+      </div>
+
+      <div class="card span5">
+        <div class="kicker">Atención</div><h2 class="title" style="margin-top:4px">Lo que cambió en tu serie</h2>
+        <div id="flags" class="flagList"></div>
+      </div>
+
+      <div class="card span12">
+        <div class="kicker">Timeline</div><h2 class="title" style="margin-top:4px">Tus repeticiones</h2>
+        <div id="repTimeline" class="repTimeline"></div>
+        <div class="subtitle" style="margin-top:8px">Haz clic en una repetición para saltar a ese momento del video.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="session" class="page">
+    <div class="grid">
+      <div class="card span9">
+        <div class="kicker">Evidencia</div><h2 class="title" style="margin-top:4px">Rep por rep</h2>
+        <div class="scroll"><table><thead><tr><th>Rep</th><th>Tiempo</th><th>Duración</th><th>Rodilla mín.</th><th>Cadera mín.</th><th>Tronco máx.</th><th>Δ rodillas</th></tr></thead><tbody id="repRows"></tbody></table></div>
+      </div>
+      <div class="card span3">
+        <h2 class="title">Acciones</h2>
+        <div class="actions" style="flex-direction:column">
+          <button id="exportBtn" class="btn">Exportar mediciones</button>
+          <button id="resetBtn" class="btn secondary">Reiniciar sesión</button>
+        </div>
+        <div class="notice" style="margin-top:12px">El JSON exportado contiene landmarks derivados, ángulos y repeticiones. No incluye un score inventado de “buena técnica”.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="deep" class="page">
+    <div class="grid">
+      <div class="card span4">
+        <div class="kicker">Deep video</div><h2 class="title" style="margin-top:4px">InternVideo3</h2>
+        <div class="statusLine"><span id="deepDot" class="statusDot"></span><span id="deepStatus">Comprobando backend…</span></div>
+        <button id="retryBackend" class="btn secondary" style="margin-top:12px">Reintentar conexión</button>
+        <div class="notice" style="margin-top:12px">El video solo se envía al backend cuando presionas <b>Analizar con InternVideo3</b>. El análisis pose del navegador no lo sube.</div>
+        <div class="subtitle" style="margin-top:10px">Video: <b id="deepFile">ninguno</b></div>
+      </div>
+
+      <div class="card span8">
+        <div class="kicker">Pregunta al video</div><h2 class="title" style="margin-top:4px">Razonamiento temporal</h2>
+        <div class="control"><textarea id="deepQuestion" placeholder="Ejemplo: ¿A partir de qué repetición cambia más mi patrón de movimiento y qué evidencia visual lo respalda?"></textarea></div>
+        <button id="deepRun" class="btn" disabled>Analizar con InternVideo3</button>
+        <div id="deepOutput" class="deepBox" style="margin-top:12px">Conecta el backend GPU y sube un video para usar la capa profunda.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="evidence" class="page">
+    <div class="grid">
+      <div class="card span7">
+        <div class="kicker">Dataset principal</div><h2 class="title" style="margin-top:4px">ALEX-GYM-1</h2>
+        <div class="split">
+          <div><div class="datasetStat">670</div><div class="subtitle">videos publicados</div></div>
+          <div><div class="datasetStat">45</div><div class="subtitle">participantes</div></div>
+        </div>
+        <div class="evidenceCard"><b>295 sentadillas</b><p>6 criterios biomecánicos específicos.</p></div>
+        <div class="evidenceCard"><b>106 zancadas</b><p>7 criterios biomecánicos específicos.</p></div>
+        <div class="evidenceCard"><b>269 single-leg Romanian deadlifts</b><p>5 criterios: balance, alineación, extensión, reversión controlada y rodilla de apoyo.</p></div>
+        <div class="notice" style="margin-top:12px">El dataset no se renombra como peso muerto convencional: el artículo especifica <b>single-leg Romanian deadlift</b>.</div>
+      </div>
+
+      <div class="card span5">
+        <div class="kicker">Arquitectura</div><h2 class="title" style="margin-top:4px">Tres niveles de evidencia</h2>
+        <div class="evidenceCard"><b>1 · Observado</b><p>Landmarks del cuerpo detectados en los frames del video.</p></div>
+        <div class="evidenceCard"><b>2 · Derivado</b><p>Ángulos, simetría, duración, fases y drift calculados desde los landmarks.</p></div>
+        <div class="evidenceCard"><b>3 · Modelo</b><p>InternVideo3 interpreta continuidad temporal y contexto visual; nunca sustituye a la medición numérica.</p></div>
+      </div>
+
+      <div class="card span12">
+        <div class="kicker">Peso muerto convencional</div><h2 class="title" style="margin-top:4px">Cómo se incorpora sin inventar entrenamiento</h2>
+        <p class="subtitle">FormLab puede medir pose y movimiento del peso muerto convencional con el mismo motor geométrico, porque eso no depende de etiquetas de ALEX. Pero la app no presenta los criterios convencionales como “aprendidos de ALEX-GYM-1”. Se etiquetan como <b>pose-only experimental</b> hasta integrar un dataset específico de deadlift convencional y validarlo.</p>
+      </div>
+
+      <div class="card span12">
+        <div class="notice warn"><b>Límite de producto:</b> FormLab describe movimiento y técnica observable. No diagnostica lesiones, no calcula probabilidad de lesión y no sustituye valoración de entrenador, fisioterapeuta o médico.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>FormLab AI · Computer vision + biomechanics + video reasoning · no simulated user measurements.</footer>
+</div><script type="module">
+import {PoseLandmarker, FilesetResolver} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/vision_bundle.mjs";
+
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const state={
+  landmarker:null, stream:null, raf:null, lastVideoTime:-1, frames:[], reps:[],
+  phase:"up", repStart:null, repAccumulator:[], currentVideoFile:null,
+  exercise:"squat", backend:{online:false,internvideo:false}, showSkeleton:true,
+  selectedCriterion:0, selectedRep:null
+};
+const IDX={LSH:11,RSH:12,LEL:13,REL:14,LWR:15,RWR:16,LHIP:23,RHIP:24,LKNEE:25,RKNEE:26,LANK:27,RANK:28,LHEEL:29,RHEEL:30,LFOOT:31,RFOOT:32,NOSE:0};
+const CONNECTIONS=PoseLandmarker.POSE_CONNECTIONS;
+
+const META={
+  squat:{
+    label:"Sentadilla",
+    reference:"ALEX-GYM-1",
+    criteria:[
+      ["Pies apoyados","view","Requiere una vista donde el contacto con el suelo sea visible."],
+      ["Coordinación cadera/rodilla","derived","Se compara la evolución temporal de los ángulos de cadera y rodilla."],
+      ["Desplazamiento posterior de cadera","derived","Puede observarse en vista lateral mediante la trayectoria relativa de cadera y tobillo."],
+      ["Espalda neutra","model","ALEX lo etiqueta, pero MediaPipe no dispone de vértebras lumbares individuales; se deja para evidencia visual profunda."],
+      ["Cadera por debajo de rodilla","derived","Se observa la relación vertical de landmarks cerca del fondo; depende de la cámara."],
+      ["Ángulo de pies","view","Necesita una vista frontal/superior adecuada; no se fuerza una conclusión en monocular."]
+    ]
+  },
+  lunge:{
+    label:"Zancada",
+    reference:"ALEX-GYM-1",
+    criteria:[
+      ["Anchura de talones","view","Dependiente de la vista frontal."],
+      ["Mirada al frente","model","Se usa contexto visual; el pose 3D no es eye tracking."],
+      ["Flexión de rodilla","derived","El ángulo se mide directamente entre cadera, rodilla y tobillo."],
+      ["Movimiento natural de brazos","model","Criterio contextual del video."],
+      ["Alineación de pies","view","Requiere que ambos pies estén visibles."],
+      ["Orientación del tronco","derived","Se usa un proxy hombro-cadera."],
+      ["Posición de rodilla posterior","derived","Evaluable si rodilla/tobillo están visibles."]
+    ]
+  },
+  single_leg_rdl:{
+    label:"Peso muerto rumano a una pierna",
+    reference:"ALEX-GYM-1",
+    criteria:[
+      ["Balance","derived","Estabilidad de trayectoria y variación del eje corporal."],
+      ["Alineación de espalda","derived","Proxy hombro-cadera; no es medición vertebral clínica."],
+      ["Extensión de pierna","derived","Geometría cadera/rodilla cuando la pierna móvil es visible."],
+      ["Reversión controlada","model","InternVideo3 puede revisar continuidad temporal y velocidad aparente."],
+      ["Ángulo de rodilla de apoyo","derived","Ángulo directo del lado visible."]
+    ]
+  },
+  conventional_deadlift:{
+    label:"Peso muerto convencional",
+    reference:"Pose-only experimental · no ALEX label",
+    criteria:[
+      ["Patrón de bisagra de cadera","derived","Se analiza la coordinación temporal del ángulo de cadera durante descenso y subida."],
+      ["Coordinación rodilla/cadera","derived","Se compara cómo cambian ambos ángulos a lo largo de cada repetición."],
+      ["Consistencia del tronco","derived","Se observa si la inclinación del tronco deriva entre repeticiones."],
+      ["Extensión al cierre","derived","Se observa si el ángulo de cadera vuelve al rango superior de la propia repetición."],
+      ["Simetría izquierda/derecha","derived","Se compara la diferencia angular entre lados cuando ambos son visibles."],
+      ["Trayectoria de la barra","view","No se mide con pose corporal. Requiere detector de objeto/barra o evidencia visual profunda."]
+    ]
+  }
+};
+
+function angle3(a,b,c){
+  if(!a||!b||!c)return null;
+  const v1=[a.x-b.x,a.y-b.y,a.z-b.z],v2=[c.x-b.x,c.y-b.y,c.z-b.z];
+  const dot=v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2],n1=Math.hypot(...v1),n2=Math.hypot(...v2);
+  if(n1<1e-6||n2<1e-6)return null;
+  return Math.acos(Math.max(-1,Math.min(1,dot/(n1*n2))))*180/Math.PI;
+}
+const mean=a=>{const v=a.filter(Number.isFinite);return v.length?v.reduce((x,y)=>x+y,0)/v.length:null};
+const median=a=>{const v=a.filter(Number.isFinite).sort((x,y)=>x-y);if(!v.length)return null;const m=(v.length-1)/2;return (v[Math.floor(m)]+v[Math.ceil(m)])/2};
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const fmt=(x,d=1)=>Number.isFinite(x)?Number(x).toFixed(d):"—";
+
+function trunkLean(w){
+  const sh={x:(w[IDX.LSH].x+w[IDX.RSH].x)/2,y:(w[IDX.LSH].y+w[IDX.RSH].y)/2,z:(w[IDX.LSH].z+w[IDX.RSH].z)/2};
+  const hp={x:(w[IDX.LHIP].x+w[IDX.RHIP].x)/2,y:(w[IDX.LHIP].y+w[IDX.RHIP].y)/2,z:(w[IDX.LHIP].z+w[IDX.RHIP].z)/2};
+  const dx=sh.x-hp.x,dy=sh.y-hp.y,dz=sh.z-hp.z;
+  return Math.atan2(Math.hypot(dx,dz),Math.abs(dy))*180/Math.PI;
+}
+function visibility(lms){return mean([11,12,23,24,25,26,27,28].map(i=>lms[i]?.visibility??0))??0}
+
+async function initPose(){
+  $("#poseText").textContent="Cargando pose…";
+  try{
+    const vision=await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm");
+    state.landmarker=await PoseLandmarker.createFromOptions(vision,{
+      baseOptions:{modelAssetPath:"https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task",delegate:"GPU"},
+      runningMode:"VIDEO",numPoses:1,minPoseDetectionConfidence:.5,minPosePresenceConfidence:.5,minTrackingConfidence:.5
+    });
+    $("#poseDot").classList.add("on");$("#poseText").textContent="Pose listo";
+  }catch(e){
+    $("#poseDot").classList.add("err");$("#poseText").textContent="Pose no disponible";
+    $("#errorBox").textContent="No se pudo cargar MediaPipe Pose: "+e.message;$("#errorBox").classList.remove("hidden");
+  }
+}
+
+function resetSession(){
+  state.frames=[];state.reps=[];state.phase="up";state.repStart=null;state.repAccumulator=[];state.lastVideoTime=-1;state.selectedRep=null;
+  ["knee","hip","trunk","sym","visibility"].forEach(k=>$("#m_"+k).textContent="—");
+  $("#repCount").textContent="0";$("#phase").textContent="esperando";$("#repTimeline").innerHTML='<span class="subtitle">Las repeticiones aparecerán aquí.</span>';
+  $("#repRows").innerHTML='<tr><td colspan="7" class="subtitle">Aún no hay repeticiones completas.</td></tr>';
+  $("#flags").innerHTML='<div class="subtitle">Aún no hay observaciones.</div>';drawTrace();
+}
+
+function metricsFromResult(result,t){
+  if(!result.landmarks?.length||!result.worldLandmarks?.length)return null;
+  const l=result.landmarks[0],w=result.worldLandmarks[0];
+  const lk=angle3(w[IDX.LHIP],w[IDX.LKNEE],w[IDX.LANK]),rk=angle3(w[IDX.RHIP],w[IDX.RKNEE],w[IDX.RANK]);
+  const lh=angle3(w[IDX.LSH],w[IDX.LHIP],w[IDX.LKNEE]),rh=angle3(w[IDX.RSH],w[IDX.RHIP],w[IDX.RKNEE]);
+  const hipY=mean([l[IDX.LHIP].y,l[IDX.RHIP].y]),kneeY=mean([l[IDX.LKNEE].y,l[IDX.RKNEE].y]);
+  return {
+    t,knee:mean([lk,rk]),hip:mean([lh,rh]),trunk:trunkLean(w),
+    symKnee:Number.isFinite(lk)&&Number.isFinite(rk)?Math.abs(lk-rk):null,
+    vis:visibility(l),hipBelowKnee:Number.isFinite(hipY)&&Number.isFinite(kneeY)?hipY>kneeY:null,lms:l,world:w
+  };
+}
+
+function primaryAngle(m){
+  return ["single_leg_rdl","conventional_deadlift"].includes(state.exercise)?m.hip:m.knee;
+}
+function segmentationThresholds(){
+  // These are rep-segmentation rules, NOT "correct technique" targets.
+  if(state.exercise==="single_leg_rdl")return {down:120,up:155};
+  if(state.exercise==="conventional_deadlift")return {down:125,up:155};
+  return {down:115,up:155};
+}
+function segmentRep(m){
+  const a=primaryAngle(m),th=segmentationThresholds();
+  if(!Number.isFinite(a)||m.vis<.42)return;
+  if(state.phase==="up"&&a<th.down){
+    state.phase="down";state.repStart=m.t;state.repAccumulator=[m];
+  }else if(state.phase==="down"){
+    state.repAccumulator.push(m);
+    if(a>th.up){
+      const arr=state.repAccumulator;
+      const finite=(k)=>arr.map(x=>x[k]).filter(Number.isFinite);
+      const rep={
+        index:state.reps.length+1,start:state.repStart,end:m.t,duration:m.t-state.repStart,
+        minKnee:Math.min(...finite("knee")),minHip:Math.min(...finite("hip")),
+        maxHip:Math.max(...finite("hip")),maxTrunk:Math.max(...finite("trunk")),minTrunk:Math.min(...finite("trunk")),
+        meanSym:mean(finite("symKnee")),meanVis:mean(finite("vis")),hipBelowKnee:arr.some(x=>x.hipBelowKnee===true)
+      };
+      state.reps.push(rep);state.phase="up";state.repStart=null;state.repAccumulator=[];
+      renderReps();renderFlags();
+    }
+  }
+  $("#phase").textContent=state.phase==="down"?"fase activa":"arriba / cierre";
+}
+function baseReps(){return state.reps.slice(0,Math.min(3,state.reps.length))}
+function renderFlags(){
+  const r=state.reps;if(!r.length)return;
+  const latest=r[r.length-1],base=baseReps(),out=[];
+  const trunkBase=median(base.map(x=>x.maxTrunk)),durBase=median(base.map(x=>x.duration));
+  if(latest.meanVis<.6)out.push(["Atención","Visibilidad baja del pose; cambia luz, distancia o ángulo de cámara."]);
+  if(Number.isFinite(latest.meanSym)&&latest.meanSym>15)out.push(["Atención",`La diferencia angular media entre rodillas fue ${fmt(latest.meanSym)}° en esta repetición.`]);
+  if(r.length>=4&&Number.isFinite(trunkBase)&&latest.maxTrunk-trunkBase>10)out.push(["Drift",`La inclinación máxima del tronco aumentó ${fmt(latest.maxTrunk-trunkBase)}° frente a la mediana de las primeras repeticiones.`]);
+  if(r.length>=4&&Number.isFinite(durBase)&&latest.duration>durBase*1.35)out.push(["Tempo",`La repetición duró ${fmt(latest.duration,2)} s frente a ${fmt(durBase,2)} s de referencia interna.`]);
+  if(state.exercise==="squat"&&!latest.hipBelowKnee)out.push(["Vista","La cadera no pasó por debajo de la rodilla en coordenadas de pantalla; esto depende de altura y perspectiva de cámara."]);
+  if(!out.length)out.push(["Consistencia","No se detectó una desviación grande respecto a las primeras repeticiones en las métricas medibles."]);
+  $("#flags").innerHTML=out.map(([a,b])=>`<div class="flag"><b>${a}</b><p>${b}</p></div>`).join("");
+}
+
+function updateLive(m){
+  $("#m_knee").textContent=fmt(m.knee)+"°";$("#m_hip").textContent=fmt(m.hip)+"°";$("#m_trunk").textContent=fmt(m.trunk)+"°";$("#m_sym").textContent=fmt(m.symKnee)+"°";$("#m_visibility").textContent=fmt(m.vis*100,0)+"%";
+  $("#repCount").textContent=state.reps.length;
+}
+function drawPose(result){
+  const v=$("#video"),c=$("#overlay");if(!v.videoWidth)return;
+  const box=c.parentElement.getBoundingClientRect();c.width=Math.max(1,Math.round(box.width*devicePixelRatio));c.height=Math.max(1,Math.round(box.height*devicePixelRatio));
+  const ctx=c.getContext("2d");ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);ctx.clearRect(0,0,box.width,box.height);
+  if(!state.showSkeleton||!result.landmarks?.length)return;
+  const l=result.landmarks[0],scale=Math.min(box.width/v.videoWidth,box.height/v.videoHeight),dw=v.videoWidth*scale,dh=v.videoHeight*scale,ox=(box.width-dw)/2,oy=(box.height-dh)/2;
+  const pts=l.map(p=>({x:ox+p.x*dw,y:oy+p.y*dh,visibility:p.visibility}));
+  ctx.strokeStyle="rgba(220,224,203,.88)";ctx.lineWidth=2;
+  CONNECTIONS.forEach(cn=>{const a=pts[cn.start],b=pts[cn.end];if(!a||!b||a.visibility<.4||b.visibility<.4)return;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()});
+  ctx.fillStyle="#78805d";pts.forEach(p=>{if(p.visibility<.4)return;ctx.beginPath();ctx.arc(p.x,p.y,2.8,0,Math.PI*2);ctx.fill()});
+}
+async function frameLoop(){
+  const v=$("#video");
+  if(state.landmarker&&!v.paused&&!v.ended&&v.currentTime!==state.lastVideoTime&&v.readyState>=2){
+    state.lastVideoTime=v.currentTime;
+    try{
+      const result=state.landmarker.detectForVideo(v,performance.now());drawPose(result);
+      const m=metricsFromResult(result,v.currentTime);
+      if(m){
+        state.frames.push({...m,lms:undefined,world:undefined});if(state.frames.length>5000)state.frames.shift();
+        updateLive(m);segmentRep(m);drawTrace();
+      }
+    }catch(e){$("#errorBox").textContent=e.message;$("#errorBox").classList.remove("hidden")}
+  }
+  state.raf=requestAnimationFrame(frameLoop);
+}
+function loadFile(file){
+  if(!file)return;stopCamera();resetSession();state.currentVideoFile=file;
+  const v=$("#video");v.srcObject=null;v.src=URL.createObjectURL(file);v.controls=true;v.muted=false;
+  $("#fileLabel").textContent=file.name;$("#deepFile").textContent=file.name;$("#emptyVideo").classList.add("hidden");
+  v.onloadedmetadata=()=>$("#duration").textContent=fmt(v.duration,1)+" s";
+  v.onplay=()=>{if(!state.raf)state.raf=requestAnimationFrame(frameLoop)};
+}
+async function startCamera(){
+  if(!navigator.mediaDevices?.getUserMedia){$("#errorBox").textContent="La cámara requiere localhost o HTTPS.";$("#errorBox").classList.remove("hidden");return}
+  try{
+    resetSession();state.currentVideoFile=null;state.stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:"user"},audio:false});
+    const v=$("#video");v.src="";v.srcObject=state.stream;v.controls=false;v.muted=true;await v.play();
+    $("#fileLabel").textContent="Cámara en vivo";$("#duration").textContent="live";$("#emptyVideo").classList.add("hidden");$("#stopCamera").disabled=false;
+    if(!state.raf)state.raf=requestAnimationFrame(frameLoop);
+  }catch(e){$("#errorBox").textContent="No se pudo abrir la cámara: "+e.message;$("#errorBox").classList.remove("hidden")}
+}
+function stopCamera(){if(state.stream){state.stream.getTracks().forEach(t=>t.stop());state.stream=null}$("#stopCamera").disabled=true}
+function seekRep(rep){
+  state.selectedRep=rep.index;const v=$("#video");
+  if(v.srcObject){return}
+  if(Number.isFinite(rep.start)){v.currentTime=Math.max(0,rep.start-.2);v.play().catch(()=>{})}
+  renderReps();
+}
+function renderReps(){
+  const r=state.reps;
+  $("#repTimeline").innerHTML=r.length?r.map(x=>`<button type="button" class="repChip ${state.selectedRep===x.index?"active":""}" data-rep="${x.index}"><b>Rep ${x.index}</b><span>${fmt(x.start,1)} s · ${fmt(x.duration,1)} s</span></button>`).join(""):'<span class="subtitle">Las repeticiones aparecerán aquí.</span>';
+  $("#repRows").innerHTML=r.length?r.map(x=>`<tr class="clickrow" data-rep="${x.index}"><td>${x.index}</td><td>${fmt(x.start,2)}–${fmt(x.end,2)}s</td><td>${fmt(x.duration,2)}s</td><td>${fmt(x.minKnee)}°</td><td>${fmt(x.minHip)}°</td><td>${fmt(x.maxTrunk)}°</td><td>${fmt(x.meanSym)}°</td></tr>`).join(""):'<tr><td colspan="7" class="subtitle">Aún no hay repeticiones completas.</td></tr>';
+  $$(".repChip,.clickrow").forEach(el=>el.addEventListener("click",()=>{const rep=r.find(x=>x.index===Number(el.dataset.rep));if(rep)seekRep(rep)}));
+}
+function drawTrace(){
+  const c=$("#trace"),ctx=c.getContext("2d"),W=c.clientWidth||600,H=c.clientHeight||112;c.width=W*devicePixelRatio;c.height=H*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);ctx.clearRect(0,0,W,H);
+  const a=state.frames.slice(-260);ctx.strokeStyle="#ddd6c8";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,H*.5);ctx.lineTo(W,H*.5);ctx.stroke();
+  if(a.length<2){ctx.fillStyle="#969584";ctx.font="10px sans-serif";ctx.fillText("Las curvas aparecerán durante la reproducción.",12,21);return}
+  [["knee","#68704b",180],["hip","#9a7d58",180],["trunk","#a86d55",90]].forEach(([k,col,max])=>{
+    ctx.strokeStyle=col;ctx.lineWidth=1.7;ctx.beginPath();let started=false;
+    a.forEach((p,i)=>{const v=p[k];if(!Number.isFinite(v))return;const x=i/(a.length-1)*(W-1),y=H-8-clamp(v/max,0,1)*(H-16);if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)});ctx.stroke()
+  })
+}
+function renderCriteria(){
+  const meta=META[state.exercise],arr=meta.criteria;$("#referenceText").textContent=meta.reference;
+  $("#criteriaPills").innerHTML=arr.map((c,i)=>`<button type="button" class="criterionBtn ${i===state.selectedCriterion?"active":""}" data-i="${i}">${c[0]}</button>`).join("");
+  const c=arr[state.selectedCriterion]||arr[0],cls=c[1]==="derived"?"":c[1]==="model"?"model":"view",lab=c[1]==="derived"?"medible":c[1]==="model"?"video AI":"depende de vista";
+  $("#criterionDetail").innerHTML=`<b>${c[0]} <span class="tag ${cls}">${lab}</span></b><p>${c[2]}</p>`;
+  $$(".criterionBtn").forEach(b=>b.addEventListener("click",()=>{state.selectedCriterion=Number(b.dataset.i);renderCriteria()}));
+}
+function sessionSummary(){
+  const r=state.reps;
+  return {
+    exercise:state.exercise,
+    exercise_label:META[state.exercise].label,
+    reference:META[state.exercise].reference,
+    complete_reps:r.length,
+    rep_duration_median_s:median(r.map(x=>x.duration)),
+    minimum_knee_angle_median_deg:median(r.map(x=>x.minKnee)),
+    minimum_hip_angle_median_deg:median(r.map(x=>x.minHip)),
+    max_trunk_lean_median_deg:median(r.map(x=>x.maxTrunk)),
+    knee_lr_difference_median_deg:median(r.map(x=>x.meanSym)),
+    pose_visibility_mean:mean(state.frames.map(x=>x.vis)),
+    provenance:"angles and repetitions derived from MediaPipe pose landmarks",
+    note:"No injury-risk score or diagnosis is produced."
+  };
+}
+function exportJson(){
+  const payload={generated_at:new Date().toISOString(),summary:sessionSummary(),repetitions:state.reps,frame_metrics:state.frames.map(({t,knee,hip,trunk,symKnee,vis,hipBelowKnee})=>({t,knee,hip,trunk,symKnee,vis,hipBelowKnee}))};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="formlab_session.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+async function checkBackend(){
+  try{
+    const r=await fetch("http://127.0.0.1:8001/api/health");if(!r.ok)throw new Error();const j=await r.json();
+    state.backend={online:true,internvideo:!!j.internvideo3_ready};$("#deepDot").className="statusDot "+(state.backend.internvideo?"on":"");$("#deepStatus").textContent=state.backend.internvideo?"InternVideo3 listo":"Backend conectado · modelo no cargado";$("#deepRun").disabled=!state.backend.internvideo;
+  }catch(e){state.backend={online:false,internvideo:false};$("#deepDot").className="statusDot";$("#deepStatus").textContent="Backend offline";$("#deepRun").disabled=true}
+}
+async function deepAnalyze(){
+  if(!state.currentVideoFile){$("#deepOutput").textContent="Sube un video primero. La cámara en vivo no se envía automáticamente al backend.";return}
+  const fd=new FormData();fd.append("video",state.currentVideoFile);fd.append("exercise",state.exercise);fd.append("biomechanics_json",JSON.stringify(sessionSummary()));fd.append("user_question",$("#deepQuestion").value.trim());
+  $("#deepRun").disabled=true;$("#deepOutput").textContent="Analizando el video con InternVideo3…";
+  try{
+    const r=await fetch("http://127.0.0.1:8001/api/deep-analyze",{method:"POST",body:fd});const j=await r.json();if(!r.ok)throw new Error(j.detail||"Error");
+    $("#deepOutput").textContent=j.analysis_text||JSON.stringify(j,null,2)
+  }catch(e){$("#deepOutput").textContent="No se pudo completar el análisis: "+e.message}
+  finally{$("#deepRun").disabled=!state.backend.internvideo}
+}
+function initNav(){
+  $$(".nav button").forEach(b=>b.addEventListener("click",()=>{$$(".nav button").forEach(x=>x.classList.remove("active"));$$(".page").forEach(x=>x.classList.remove("active"));b.classList.add("active");$("#"+b.dataset.page).classList.add("active")}));
+}
+function initDrop(){
+  const box=$("#fileDrop"),inp=$("#videoFile");
+  ["dragenter","dragover"].forEach(ev=>box.addEventListener(ev,e=>{e.preventDefault();box.classList.add("drag")}));
+  ["dragleave","drop"].forEach(ev=>box.addEventListener(ev,e=>{e.preventDefault();box.classList.remove("drag")}));
+  box.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(f&&f.type.startsWith("video/"))loadFile(f)});
+  inp.addEventListener("change",e=>loadFile(e.target.files?.[0]));
+}
+function init(){
+  initNav();initDrop();renderCriteria();resetSession();checkBackend();setInterval(checkBackend,15000);
+  $("#exercise").addEventListener("change",e=>{state.exercise=e.target.value;state.selectedCriterion=0;resetSession();renderCriteria()});
+  $("#startCamera").addEventListener("click",startCamera);$("#stopCamera").addEventListener("click",stopCamera);
+  $("#skeletonToggle").addEventListener("change",e=>state.showSkeleton=e.target.checked);
+  $("#resetBtn").addEventListener("click",resetSession);$("#exportBtn").addEventListener("click",exportJson);
+  $("#deepRun").addEventListener("click",deepAnalyze);$("#retryBackend").addEventListener("click",checkBackend);
+  window.addEventListener("resize",drawTrace);window.addEventListener("beforeunload",stopCamera);
+}
+init();initPose();
+</script></body></html>

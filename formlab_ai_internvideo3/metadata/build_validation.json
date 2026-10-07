@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "frontend_javascript_syntax": "PASS",
+  "frontend_detail": "",
+  "python_syntax_ast_parse": {
+    "serve.py": "PASS",
+    "backend/app.py": "PASS",
+    "backend/internvideo3_service.py": "PASS",
+    "scripts/alexgym1_adapter.py": "PASS"
+  },
+  "checks": {
+    "deadlift_option": true,
+    "single_leg_rdl_distinguished": true,
+    "beige_olive_theme": true,
+    "drag_drop_upload": true,
+    "camera_mode": true,
+    "clickable_reps": true,
+    "interactive_criteria": true,
+    "pose_engine": true,
+    "internvideo3": true,
+    "no_fake_score": true
+  },
+  "validation_note": "Python was syntax-checked with ast.parse to avoid writing __pycache__ in the artifact directory.",
+  "notes": [
+    "Conventional deadlift is implemented as pose-only experimental mode.",
+    "ALEX-GYM-1 is explicitly attributed only to squat, lunge and single-leg Romanian deadlift.",
+    "Rep cards and rep-table rows seek the uploaded video to the selected repetition.",
+    "No simulated user measurements or mocked InternVideo3 output are included."
+  ]
+}

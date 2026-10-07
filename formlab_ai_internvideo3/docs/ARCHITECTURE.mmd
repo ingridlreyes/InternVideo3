@@ -1,0 +1,30 @@
+flowchart TB
+U[User video or webcam] --> P[Browser fast path]
+P --> MP[MediaPipe Pose Landmarker<br/>33 landmarks]
+MP --> ANG[Biomechanics Engine<br/>knee hip elbow trunk]
+ANG --> REP[Rep Segmentation<br/>transparent state machine]
+REP --> DRIFT[Within-session Drift & Symmetry]
+ANG --> EXPORT[Measured JSON export]
+
+U -->|Explicit deep-analysis action| API[FastAPI backend]
+ANG -->|Derived summary| API
+API --> IV3[InternVideo3-8B-Instruct<br/>4 FPS video reasoning]
+ALEX[ALEX-GYM-1<br/>670 published videos<br/>criterion annotations] --> RUBRIC[Exercise Criteria Rubric]
+RUBRIC --> IV3
+RUBRIC --> FAST[Fast-layer measurability map]
+IV3 --> EXPLAIN[Evidence-grounded explanation<br/>timestamps + unable_to_assess]
+DRIFT --> UI[Interactive FormLab UI]
+FAST --> UI
+EXPLAIN --> UI
+
+subgraph Provenance
+O[OBSERVED<br/>pose landmarks]
+D[DERIVED<br/>angles timing reps]
+M[MODEL<br/>InternVideo3 interpretation]
+end
+
+MP --> O
+ANG --> D
+IV3 --> M
+
+X[Conventional deadlift<br/>pose-only experimental] --> ANG
